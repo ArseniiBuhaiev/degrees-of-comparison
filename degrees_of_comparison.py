@@ -1,5 +1,5 @@
 import re
-from segment import Adj_F
+from segment import Adj_F #імпортування бібліотек
 
 def degrees_of_comparison(word: str) -> str:
     
@@ -9,18 +9,18 @@ def degrees_of_comparison(word: str) -> str:
         "поган" : "гірш",
         "велик" : "більш",
         "мал" : "менш"
-    }
+    } #словник суплетивних основ слів
     
-    R = ["м'як", "різк", "лег", "гірк", "яскрав"]
+    R = ["м'як", "різк", "лег", "гірк", "яскрав"] #словник коренів
 
     flexions = {
         "я" : "а",
         "ю" : "у",
         "є" : "е",
         "ій" : "ий",
-    }
+    } #словник для замін відповідних флексій у формах ступенів порівняння
 
-    O_cut = ["довг"]
+    O_cut = ["довг"] #словник основ із усіченням кінцевої графеми
 
     P = "най"
     S1 = "іш"
@@ -28,7 +28,7 @@ def degrees_of_comparison(word: str) -> str:
     S3 = "ч"
     S = S1
     
-    try:
+    try: #призначення змінним O, F значення основи та флексії та перевірка чи є слово прикметником
         O, F = Adj_F(word)
     except ValueError:
         return 'Слово не є прикметником.'
@@ -37,19 +37,19 @@ def degrees_of_comparison(word: str) -> str:
         and O not in R
     bad_prefix = re.findall(r"\b(пре|за|над|пра)", O) \
         and O not in R
-    not_applicable = bad_suffix or bad_prefix
+    not_applicable = bad_suffix or bad_prefix #правила, за якими прикметник не має ступенів порівняння
 
-    if not_applicable:
+    if not_applicable: # перевірка чи має слово ступені порівняння
         return 'Слово не має ступенів порівняння.'
-    elif O in suppletives:
+    elif O in suppletives: #заміна основи на суплетивну, якщо слово відповідає моделі
         O = suppletives[O]
         S = ""
     else:
-        if O in O_cut:
+        if O in O_cut: #усічення кінцевої графеми, якщо слово відповідає моделі
             O = O[:-1]
             S = S2
         else:
-            cut_ok_ek = re.findall(r"([\w\']+)(ок|ек)\b", O)
+            cut_ok_ek = re.findall(r"([\w\']+)(ок|ек)\b", O) #усічення суфікса, якщо слово відповідає моделі
             cut_k = re.findall(r"([\w\']+)(к)\b", O)
             if cut_ok_ek and O not in R:
                 O = (cut_ok_ek[0])[0]
@@ -62,7 +62,7 @@ def degrees_of_comparison(word: str) -> str:
 
             alternate_h = re.findall(r"г\b", O)
             alternate_z = re.findall(r"зь\b", O)
-            alternate_s = re.findall(r"с\b", O)
+            alternate_s = re.findall(r"с\b", O) #чергування кінцевої графеми
 
             if alternate_h and O not in O_cut:
                 O = re.sub(r"г\b", "ж", O)
@@ -80,11 +80,11 @@ def degrees_of_comparison(word: str) -> str:
             if O.endswith("ж"):
                 S = S3 
 
-    if F in flexions.keys():
+    if F in flexions.keys(): #заміна флексії на відповідну до форми
         F = flexions[F]
 
-    higher_degree = O + S + F
-    highest_degree = P + higher_degree
+    higher_degree = O + S + F #творення форми вищого ступеня
+    highest_degree = P + higher_degree #творення форми найвищого ступеня
 
     return f"{higher_degree}, {highest_degree}"
 
